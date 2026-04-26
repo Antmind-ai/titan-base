@@ -1,0 +1,65 @@
+# Secrets — never commit
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+
+# Tests / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Linters / type checkers
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# Logs
+logs/
+*.log
+
+# Docker volumes (never committed)
+# postgres_data, redis_data are managed by Docker
+
+# OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Editor
+.vscode/
+.idea/
+*.iml
+
+# Alembic (keep versions, not cache)
+alembic/__pycache__/
+
+# Docker
+docker-compose.override.yml
+
+# Others
+.claude/

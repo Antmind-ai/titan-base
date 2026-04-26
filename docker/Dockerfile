@@ -1,0 +1,52 @@
+# ── Builder stage ─────────────────────────────────────────────────────────────
+FROM python:3.13-slim AS builder
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /venv
+ENV PATH=/venv/bin:$PATH
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+
+# ── Production stage ──────────────────────────────────────────────────────────
+FROM python:3.13-slim AS production
+
+LABEL maintainer="Antmind Ventures Private Limited"
+LABEL org.opencontainers.image.title="Titan API"
+LABEL org.opencontainers.image.version="1.0.0"
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq5 \
+        curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r titan \
+    && useradd -r -g titan -d /app -s /sbin/nologin titan
+
+COPY --from=builder /venv /venv
+ENV PATH=/venv/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONFAULTHANDLER=1
+
+COPY --chown=titan:titan . .
+RUN chmod +x docker/entrypoint.sh
+
+USER titan
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+ENTRYPOINT ["docker/entrypoint.sh"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "app.main:app"]

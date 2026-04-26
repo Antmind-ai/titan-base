@@ -1,0 +1,45 @@
+[project]
+name = "titan"
+version = "1.0.0"
+description = "High-performance multi-service API platform by Antmind Ventures Private Limited"
+requires-python = ">=3.13"
+
+# ── Ruff — linter + formatter ──────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["app"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes  (undefined names, unused imports)
+    "I",    # isort     (import order)
+    "B",    # bugbear   (likely bugs & design issues)
+    "C4",   # comprehensions
+    "UP",   # pyupgrade (modern Python syntax)
+    "SIM",  # simplify  (simplifiable expressions)
+    "RUF",  # ruff-specific rules
+    "S",    # bandit    (security)
+    "T20",  # no print statements in production code
+]
+ignore = [
+    "B008",   # FastAPI Depends() / Query() calls in function defaults
+    "S101",   # assert usage (fine in non-test code here)
+    "SIM108", # ternary can reduce readability
+    "S104",   # binding to 0.0.0.0 — intentional for containers
+    "S603",   # subprocess — not used but pre-emptive ignore
+]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/*" = ["F401"]  # imported models are used by Alembic, not directly
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+force-sort-within-sections = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
